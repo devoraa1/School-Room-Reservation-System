@@ -1,0 +1,147 @@
+/* Building plan (clickable rooms) for the Rooms panel + open-time list in the Reserve form */
+.bp { margin: 18px 0 8px; }
+.bp-scroll { overflow-x: auto; border: 1px solid var(--line-strong); border-radius: var(--radius-md); background: var(--tint); padding: 10px; }
+.bp-floor { display: grid; grid-template-columns: 56px minmax(0, 1fr); min-width: 560px; min-height: 96px; border: 2px solid var(--line-strong); background: var(--surface-solid); }
+.bp-floor + .bp-floor { border-top: 0; }
+.bp-label { display: flex; align-items: center; justify-content: center; writing-mode: vertical-rl; font-weight: 700; font-size: 12px;
+  letter-spacing: 1px; color: var(--accent); border-right: 2px solid var(--line-strong); background: var(--tint-strong); }
+.bp-space { display: flex; align-items: stretch; padding: 8px; min-width: 0; }
+.bp-empty { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--ink-faint); font-size: 12px; letter-spacing: 2px; }
+.bp-stairs { flex: 0 0 34px; margin: 0 8px; border: 1px solid var(--line-strong); display: flex; align-items: center; justify-content: center;
+  writing-mode: vertical-rl; font-size: 10px; color: var(--ink-faint);
+  background: repeating-linear-gradient(0deg, transparent, transparent 7px, var(--line) 8px, var(--line) 9px); }
+
+/* Room cells: just the room number and a door mark, click to reserve */
+.bp-room { --c: var(--line-strong); position: relative; flex: 1 1 0; min-width: 0; display: flex; border: 1.5px solid var(--c); background: var(--tint); }
+.bp-room + .bp-room { border-left: 0; }
+.bp-room.is-open { --c: var(--ok); background: var(--ok-bg); }
+.bp-room.is-full { --c: var(--danger); background: var(--danger-bg); }
+.bp-room.is-none { --c: #94a3b8; background: color-mix(in srgb, #94a3b8 22%, transparent); }
+.bp-room.is-none .bp-room-btn { color: var(--ink-faint); }
+.bp-room.is-dim { opacity: .35; }
+.bp-room.is-off { --c: var(--ink-faint); border-style: dashed; opacity: .55;
+  background: repeating-linear-gradient(45deg, transparent 0, transparent 6px, color-mix(in srgb, var(--ink-faint) 45%, transparent) 6px, color-mix(in srgb, var(--ink-faint) 45%, transparent) 7px); }
+.bp-room.is-off .bp-room-btn { cursor: not-allowed; color: var(--ink-faint); }
+.bp-room.is-off .bp-room-btn:hover { background: transparent; box-shadow: none; }
+.bp-room-btn { flex: 1; min-height: 78px; padding: 8px 3px; border: 0; background: transparent; color: var(--ink); font: inherit; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; }
+.bp-room-btn:hover, .bp-room-btn:focus-visible { background: var(--accent-soft); outline: none; box-shadow: inset 0 0 0 2px var(--accent); }
+.bp-name { font-size: 13px; font-weight: 700; }
+.bp-door { width: 15px; height: 7px; border-top: 2px solid var(--ink-faint); }
+
+/* Admin edit / remove */
+.bp-admin { position: absolute; top: 2px; right: 2px; display: flex; gap: 2px; z-index: 1; }
+.bp-admin button { border: 0; background: transparent; cursor: pointer; font-size: 11px; padding: 2px; opacity: .6; }
+.bp-admin button:hover { opacity: 1; }
+
+.bp-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; font-size: 11px; color: var(--ink-dim); }
+.bp-legend i.sw-none { background: #94a3b8; }
+.bp-legend i.sw-off { background: repeating-linear-gradient(45deg, var(--ink-faint) 0, var(--ink-faint) 2px, transparent 2px, transparent 4px); outline: 1px dashed var(--ink-faint); outline-offset: -1px; }
+.bp-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.bp-hint { font-size: 11px; color: var(--ink-faint); margin: 6px 0 14px; text-align: center; }
+
+/* ---------- Room view: weekly schedule + booking form ---------- */
+.sch { margin-top: 14px; }
+.sch-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.sch-head h3 { margin: 0; font-size: 18px; }
+.sch-room { color: var(--accent); }
+.sch-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 18px; align-items: start; }
+.sch-main { min-width: 0; }
+.sch-weeknav { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+.sch-weeklabel { font-weight: 700; font-size: 14px; text-align: center; }
+/* Mon-Fri columns always share the available width (no side scrolling). Each
+   block is positioned by its time, so a 10 AM - 12 PM stretch is one block. */
+.sch-wrap { overflow: hidden; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--surface-solid); }
+.sch-grid { --tcol: 78px; display: grid; grid-template-columns: var(--tcol) repeat(6, minmax(0, 1fr)); }
+.sch-h { text-align: center; padding: 7px 2px; font-size: 11px; font-weight: 700; color: var(--ink); border-bottom: 1px solid var(--line-strong); border-left: 1px solid var(--line); }
+.sch-h:first-child { border-left: 0; align-self: center; font-size: 10px; color: var(--ink-dim); }
+.sch-h small { display: block; font-weight: 400; color: var(--ink-faint); margin-top: 2px; font-size: 9px; }
+.sch-h.is-today { color: var(--accent); }
+.sch-h.is-selected { background: color-mix(in srgb, var(--accent) 9%, transparent); box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--accent) 55%, transparent); }
+.sch-col, .sch-axis { position: relative; height: 616px; }
+.sch-col { border-left: 1px solid var(--line); background-image: linear-gradient(to bottom, transparent calc(100% - 1px), var(--line) 100%); background-size: 100% calc(100% / 28); }
+.sch-axis { background: var(--tint); }
+.sch-tl { position: absolute; left: 0; right: 0; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: var(--ink-dim); white-space: nowrap; overflow: hidden; border-top: 1px solid var(--line); }
+.sch-tl .t-short { display: none; }
+.sch-col.is-past { background-color: var(--tint-strong); }
+.sch-col.is-selected { background-color: color-mix(in srgb, var(--accent) 5%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent); }
+.sch-block { position: absolute; left: 3px; right: 3px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; border: 1px solid transparent; border-radius: 4px; font-size: 10px; font-weight: 600; line-height: 1.2; color: var(--ink); cursor: default; }
+.sch-block span { padding: 0 2px; }
+.sch-block.available { background: color-mix(in srgb, var(--ok) 28%, transparent); border-color: var(--ok); }
+.sch-block.pending { background: color-mix(in srgb, #fb923c 32%, transparent); border-color: #fb923c; }
+.sch-block.approved { background: color-mix(in srgb, var(--danger) 32%, transparent); border-color: var(--danger); }
+
+/* Booking form (right side) */
+.sch-side { border: 1px solid var(--line-strong); border-radius: var(--radius-md); background: var(--tint); padding: 16px; min-width: 0; }
+.sch-side h4 { margin: 0 0 6px; font-size: 16px; }
+.sch-summary { background: var(--tint-strong); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 10px 12px; margin: 12px 0; font-size: 12px; line-height: 1.55; }
+.sch-side .btn { width: 100%; margin-top: 14px; }
+.sch-side .ta-chips { grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); }
+
+@media (max-width: 850px) {
+  .sch-layout { grid-template-columns: 1fr; }
+}
+
+/* ---------- Reserve form: open times for the chosen date ---------- */
+.time-avail { margin: 4px 0 12px; }
+.ta-title { font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--ink); }
+.ta-empty { font-size: 13px; color: var(--danger-ink); background: var(--danger-bg); border: 1px solid var(--danger-border); border-radius: var(--radius-sm); padding: 10px 12px; margin: 0; }
+.ta-window { border: 1px solid var(--line); background: var(--tint); border-radius: var(--radius-sm); padding: 10px; margin-bottom: 8px; }
+.ta-window-label { font-size: 11px; color: var(--ink-faint); margin-bottom: 8px; }
+.ta-chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 6px; }
+.ta-chip { font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; padding: 8px 6px; border-radius: 8px; border: 1px solid var(--ok-border); background: var(--ok-bg); color: var(--ok-ink); }
+.ta-chip:hover, .ta-chip:focus-visible { border-color: var(--ok); outline: none; box-shadow: 0 0 0 2px var(--ok); }
+.ta-chip.selected { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+
+@media (max-width: 560px) {
+  .bp-scroll { padding: 6px; }
+  .bp-floor { grid-template-columns: 38px minmax(0, 1fr); min-width: 480px; min-height: 80px; }
+  .bp-space { padding: 5px 3px; }
+  .bp-stairs { flex-basis: 20px; margin: 0 3px; font-size: 8px; }
+  .bp-label { font-size: 10px; letter-spacing: 0; }
+  .bp-room-btn { min-height: 60px; }
+  .bp-name { font-size: 11px; }
+  .sch-weeknav .btn { padding-left: 10px; padding-right: 10px; }
+  .sch-grid { --tcol: 34px; }
+  .sch-col, .sch-axis { height: 520px; }
+  .sch-tl { font-size: 7px; }
+  .sch-tl .t-full { display: none; }
+  .sch-tl .t-short { display: inline; }
+  .sch-h:first-child { font-size: 8px; }
+  .sch-h { font-size: 10px; padding: 5px 0; }
+  .sch-h small { font-size: 8px; }
+  .sch-block { left: 1px; right: 1px; font-size: 8px; }
+  .sch-block.class small { font-size: 7px; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bp-room-btn, .ta-chip { transition: background .15s, box-shadow .15s; }
+}
+
+
+/* Notification bell: lives in the header bar, top right (no overlap) */
+/* Header sits above the page cards so the dropdown is never hidden behind them */
+.topbar { position: relative; z-index: 40; }
+@media (min-width: 901px) { .topbar { position: sticky; } }
+.notif-bell { position: relative; flex: none; margin-left: auto; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+  padding: 0; font-size: 18px; line-height: 1; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--surface-solid); color: var(--ink);
+  box-shadow: var(--shadow); cursor: pointer; }
+.notif-bell:hover, .notif-bell:focus-visible { border-color: var(--accent); outline: none; box-shadow: 0 0 0 2px var(--accent); }
+.notif-bell .nav-badge { position: absolute; top: -4px; right: -4px; margin: 0; }
+
+/* Notifications dropdown: opens under the bell, right-aligned */
+.notif-wrap { position: relative; flex: none; margin-left: auto; }
+.notif-wrap .notif-bell { margin-left: 0; }
+.notif-pop { display: none; position: absolute; top: calc(100% + 10px); right: 0; z-index: 60; width: min(340px, calc(100vw - 48px)); padding: 14px;
+  background: var(--surface-solid); border: 1px solid var(--line-strong); border-radius: var(--radius-lg); box-shadow: 0 18px 44px rgba(2, 6, 16, .5); text-align: left; }
+.notif-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.notif-head h2 { margin: 0; font-size: 16px; }
+.notif-head .modal-close { position: static; flex: none; }
+.notif-scroll { max-height: min(320px, 55vh); overflow-y: auto; }
+.notif-actions { display: flex; gap: 8px; margin-top: 10px; }
+.notif-actions .btn { flex: 1; padding: 9px 8px; font-size: 13px; }
+
+/* Form: one option per open stretch */
+.ta-list { display: grid; gap: 6px; margin-bottom: 8px; }
+.ta-chip.ta-wide { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 12px; font-size: 13px; text-align: left; }
+.ta-chip.ta-wide small { font-size: 11px; font-weight: 500; opacity: .8; }

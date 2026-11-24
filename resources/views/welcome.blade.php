@@ -1,0 +1,229 @@
+@extends('layouts.app')
+
+@section('title', 'Room Reservation System — Book Campus Rooms with Confidence')
+@section('body-class', 'landing')
+
+@section('content')
+<div class="auth-bg" aria-hidden="true">
+        <span class="orb orb-1"></span>
+        <span class="orb orb-2"></span>
+        <span class="orb orb-3"></span>
+        <span class="orb orb-4"></span>
+    </div>
+
+    <!-- NAVBAR -->
+    <nav class="navbar" id="navbar">
+        <a class="auth-brand" href="{{ route('home') }}">
+            <span class="auth-logo"><img src="{{ asset('images/ccis-logo.png') }}" alt="CCIS logo"></span>
+            <span class="auth-wordmark">Room Reservation</span>
+        </a>
+
+        <div class="nav-links">
+            <a href="javascript:void(0)" onclick="switchLandingPanel('home')">Home</a>
+            <a href="javascript:void(0)" onclick="switchLandingPanel('features')">Features</a>
+            <a href="javascript:void(0)" onclick="switchLandingPanel('how-it-works')">How It Works</a>
+            <a href="javascript:void(0)" onclick="switchLandingPanel('faq')">FAQ</a>
+        </div>
+
+        <div class="nav-actions">
+            <button class="theme-toggle" type="button" onclick="toggleTheme()" aria-label="Toggle light and dark mode">
+                <span class="theme-toggle-thumb">🌙</span>
+            </button>
+            <a class="btn success" href="{{ auth()->check() ? route('dashboard') : route('login') }}">{{ auth()->check() ? 'Go to Dashboard' : 'Sign In' }}</a>
+            <button class="nav-toggle" id="navToggle" type="button" aria-label="Toggle menu">☰</button>
+        </div>
+    </nav>
+
+    <!-- HOME PANEL -->
+    <div class="landing-panel active" id="lp-home">
+        <section class="hero">
+            <div>
+                <h1>Reserve the right room, every time.</h1>
+                <p class="hero-sub">
+                    Pick a room, choose a time, and get approved in just a few clicks.
+                </p>
+                <div class="hero-ctas">
+                    <a class="btn success" href="{{ auth()->check() ? route('dashboard') : route('login') }}">{{ auth()->check() ? 'Go to Dashboard' : 'Sign In' }}</a>
+                    <a class="btn ghost" href="javascript:void(0)" onclick="switchLandingPanel('how-it-works')">See How It Works</a>
+                </div>
+            </div>
+
+            <div class="hero-art" role="img" aria-label="Animated 3D preview of rooms switching between open, pending and booked">
+                <div class="scene" id="roomScene" aria-hidden="true"></div>
+                <ul class="scene-legend" aria-hidden="true">
+                    <li><i class="open"></i>Open</li>
+                    <li><i class="pending"></i>Pending</li>
+                    <li><i class="booked"></i>Booked</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <!-- FEATURES PANEL -->
+    <div class="landing-panel" id="lp-features">
+        <section class="section">
+            <div class="section-head">
+                <span class="section-eyebrow">Why Teams Switch</span>
+                <h2>Everything your campus needs</h2>
+                <p>
+                    Built specifically for how schools actually book rooms —
+                    any time you need, real approvals, and no spreadsheets.
+                </p>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🟢</div>
+                    <h3>Real-Time Availability</h3>
+                    <p>See exactly which time blocks are open, pending, or
+                       booked for any room before you request one.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Book Any Time You Need</h3>
+                    <p>Choose your own start and end time within the day —
+                       no fixed blocks — and submit a request in seconds.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">✅</div>
+                    <h3>Admin Approval Workflow</h3>
+                    <p>Every request is reviewed by an admin, who can approve
+                       or reject it with one click.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Admin-Managed Accounts</h3>
+                    <p>There's no open sign-up. Every account is created by the
+                       school admin, so only real staff and students get in.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏫</div>
+                    <h3>Role-Based Access</h3>
+                    <p>Student leaders, teachers, staff, and admins each get
+                       a view suited to what they actually need to do.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Works On Any Device</h3>
+                    <p>Book from a phone between classes or from a desktop in
+                       the faculty office — same experience either way.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- HOW IT WORKS PANEL -->
+    <div class="landing-panel" id="lp-how-it-works">
+        <section class="section">
+            <div class="section-head">
+                <span class="section-eyebrow">Simple By Design</span>
+                <h2>Four steps to a booked room</h2>
+                <p>
+                    No training required — if you've used a calendar app before,
+                    you already know how this works.
+                </p>
+            </div>
+
+            <div class="steps">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3>Get Your Login</h3>
+                    <p>The school admin creates your account. Sign in with the
+                       email and password they give you.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3>Browse &amp; Pick a Date</h3>
+                    <p>Check any room's schedule for the day you need it.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3>Pick Your Time</h3>
+                    <p>Enter any start and end time that works for you, and
+                       tell us what it's for.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h3>Get Approved</h3>
+                    <p>An admin reviews your request — you'll see the status
+                       update to Approved or Rejected.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- FAQ PANEL -->
+    <div class="landing-panel" id="lp-faq">
+        <section class="section">
+            <div class="section-head">
+                <span class="section-eyebrow">Good To Know</span>
+                <h2>Frequently asked questions</h2>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Do I need to install anything?</h3>
+                    <p>No — it runs entirely in your browser, on any device.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Can two people book overlapping times?</h3>
+                    <p>No. Once a time range is pending or approved, that
+                       overlap is locked for everyone else until it's freed up.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>How do I get an account?</h3>
+                    <p>Accounts are created by the school admin for teachers,
+                       staff, and student leaders. Ask the admin office for
+                       your login.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Who can approve reservations?</h3>
+                    <p>Only accounts with the Administrator role can approve,
+                       reject, or manage rooms and users.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Can I change my email or password?</h3>
+                    <p>Yes — open the Profile tab in your dashboard to update
+                       either one. Forgot your password? Use the link on the
+                       login page to send a reset request to the admin.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="landing-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="auth-brand">
+                    <span class="auth-logo"><img src="{{ asset('images/ccis-logo.png') }}" alt="CCIS logo"></span>
+                    <span class="auth-wordmark">Room Reservation</span>
+                </div>
+                <p>
+                    A simple, transparent way for schools to manage room
+                    bookings — from request to approval.
+                </p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Product</h4>
+                <a href="javascript:void(0)" onclick="switchLandingPanel('features')">Features</a>
+                <a href="javascript:void(0)" onclick="switchLandingPanel('how-it-works')">How It Works</a>
+                <a href="javascript:void(0)" onclick="switchLandingPanel('faq')">FAQ</a>
+            </div>
+
+            <div class="footer-col">
+                <h4>Account</h4>
+                <a href="{{ auth()->check() ? route('dashboard') : route('login') }}">{{ auth()->check() ? 'Go to Dashboard' : 'Sign In' }}</a>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            © {{ date('Y') }} Room Reservation System
+        </div>
+    </footer>
+@endsection
+
+@push('scripts')
+    <script src="{{ asset('js/home.js') }}"></script>
+@endpush
